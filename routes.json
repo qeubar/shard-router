@@ -1,0 +1,14 @@
+[
+    {
+        "path": "/v1/products",
+        "methods": ["GET", "POST", "DELETE", "PATCH"]
+    },
+    {
+        "path": "/v1/products/{id}",
+        "methods": ["GET", "POST", "DELETE", "PATCH"]
+    },
+    {
+        "path": "/v1/products/{id}/images",
+        "methods": ["GET", "POST", "DELETE"]
+    }
+]
