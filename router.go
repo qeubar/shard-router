@@ -1,7 +1,6 @@
-package api
+package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,23 +14,16 @@ type endpoint struct {
 	Methods []string `json:"methods"`
 }
 
-func loadRoutes() (endpoints []endpoint, err error) {
-	fileBytes, err := ioutil.ReadFile(routesFile)
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO: maybe add validation
-	err = json.Unmarshal(fileBytes, &endpoints)
-	return
+type shard struct {
+	Lower  int    `json:"lower"`
+	Upper  int    `json:"upper"`
+	Server string `json:"server"`
 }
 
-func routes() http.Handler {
-	endpoints, err := loadRoutes()
-	if err != nil {
-		panic(err)
-	}
+var shards []shard
+var endpoints []endpoint
 
+func routes() http.Handler {
 	mux := chi.NewMux()
 	// TODO: add tests that all methods are caught
 	for _, endpoint := range endpoints {

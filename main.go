@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"shard-router/api"
-
 	"github.com/urfave/cli/v2"
 )
 
@@ -13,7 +11,7 @@ var appCommands = []*cli.Command{
 	{
 		Name:   "server",
 		Usage:  "start the API HTTP server",
-		Action: api.StartServer,
+		Action: startServer,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "proxy-protocol",
@@ -26,7 +24,7 @@ var appCommands = []*cli.Command{
 func main() {
 	app := &cli.App{
 		Name:     "shard-router",
-		Usage:    "Shard-aware web routing and cli",
+		Usage:    "Shard-aware web routing",
 		Version:  "0.0.1",
 		Commands: appCommands,
 	}

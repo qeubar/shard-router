@@ -1,8 +1,10 @@
-package api
+package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -19,6 +21,7 @@ var (
 	waitFor    time.Duration
 	httpPort   int
 	routesFile string
+	shardsFile string
 )
 
 func init() {
@@ -39,6 +42,11 @@ func init() {
 		routesFile = "routes.json" // try a default
 	}
 
+	shardsFile = os.Getenv("SHARD_ROUTER_SHARDS_FILE")
+	if shardsFile == "" {
+		shardsFile = "shards.json" // try a default
+	}
+
 	httpTimeout := 10 * time.Second
 	envHTTPTimeout, err := strconv.Atoi(os.Getenv("SHARD_ROUTER_HTTP_TIMEOUT"))
 	if err == nil && envHTTPTimeout > 0 {
@@ -50,11 +58,35 @@ func init() {
 	httpClient = &http.Client{Transport: tr, Timeout: httpTimeout}
 }
 
-func StartServer(c *cli.Context) (err error) {
+func loadConf() error {
+	fileBytes, err := ioutil.ReadFile(routesFile)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(fileBytes, &endpoints)
+	if err != nil {
+		return err
+	}
+
+	fileBytes, err = ioutil.ReadFile(shardsFile)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(fileBytes, &shards)
+}
+
+func startServer(c *cli.Context) (err error) {
 	stop := make(chan os.Signal)
 	signal.Notify(stop, syscall.SIGINT)
 	signal.Notify(stop, syscall.SIGTERM)
 	signal.Notify(stop, syscall.SIGQUIT)
+
+	err = loadConf()
+	if err != nil {
+		return
+	}
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", httpPort))
 	if err != nil {

@@ -1,0 +1,17 @@
+[
+    {
+        "lower": 1,
+        "upper": 499,
+        "server": "localhost.shard0"
+    },
+    {
+        "lower": 500,
+        "upper": 999,
+        "server": "localhost.shard1"
+    },
+    {
+        "lower": 1000,
+        "upper": 9999,
+        "server": "localhost.shard2"
+    }
+]
